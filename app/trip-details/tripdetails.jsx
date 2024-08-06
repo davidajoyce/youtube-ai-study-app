@@ -6,6 +6,7 @@ import moment from 'moment'
 import FlightInfo from '../../components/TripDetails/FlightInfo';
 import HotelList from '../../components/TripDetails/HotelList';
 import PlannedTrip from '../../components/TripDetails/PlannedTrip';
+
 export default function TripDetails() {
 
     const navigation=useNavigation();

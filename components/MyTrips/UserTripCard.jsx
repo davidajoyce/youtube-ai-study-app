@@ -11,7 +11,7 @@ export default function UserTripCard({trip}) {
   return (
 
     <TouchableOpacity
-    onPress={()=>router.push({pathname: '/trip-details',
+    onPress={()=>router.push({pathname: '/trip-details/tripdetails',
     params:{
         trip:JSON.stringify(trip)
     }})} style={{

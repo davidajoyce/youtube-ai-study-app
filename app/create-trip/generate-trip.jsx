@@ -27,9 +27,11 @@ export default function GenerateTrip() {
             .replace('{totalDays}', tripData.totalNoOfDays)
             .replace('{totalNight}', tripData.totalNoOfDays - 1);
 
+        console.log('FINAL_PROMPT')
         console.log(FINAL_PROMPT);
 
         const result = await chatSession.sendMessage(FINAL_PROMPT);
+        console.log('response from gemini')
         console.log(result.response.text());
         const tripResp = JSON.parse(result.response.text());
         setLoading(false)
@@ -47,11 +49,6 @@ export default function GenerateTrip() {
 
 
         router.push('(tabs)/mytrip');
-
-
-
-
-
 
     }
 
