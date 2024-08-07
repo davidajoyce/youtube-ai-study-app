@@ -1,11 +1,12 @@
-import { View, Text, Image, ScrollView } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, Image, ScrollView, Button } from 'react-native'
+import React, {useEffect, useState } from 'react'
 import { useLocalSearchParams, useNavigation } from 'expo-router'
 import { Colors } from '../../constants/Colors';
 import moment from 'moment'
 import FlightInfo from '../../components/TripDetails/FlightInfo';
 import HotelList from '../../components/TripDetails/HotelList';
 import PlannedTrip from '../../components/TripDetails/PlannedTrip';
+import YoutubePlayer from "react-native-youtube-iframe";
 
 export default function TripDetails() {
 
@@ -28,7 +29,7 @@ export default function TripDetails() {
 
   return tripDetails&&(
     <ScrollView>
-         <Image source={{uri:
+         {/* <Image source={{uri:
         'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference='
         +formatData(tripDetails?.tripData).locationInfo?.photoRef
         +'&key='+process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}}
@@ -37,6 +38,11 @@ export default function TripDetails() {
                 height:330,
                 
         }}
+        /> */}
+        <YoutubePlayer
+        height={300}
+        play={false}
+        videoId={"iee2TATGMyI"}
         />
         <View style={{
             padding:15,

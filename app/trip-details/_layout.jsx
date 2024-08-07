@@ -11,21 +11,21 @@ export default function TabLayout() {
     }}>
         <Tabs.Screen name="tripdetails"
           options={{
-            tabBarLabel:'My Trip',
+            tabBarLabel:'Summary',
             tabBarIcon:({color})=><Ionicons name="location-sharp" 
             size={24} color={color} />
           }}
         />
         <Tabs.Screen name="questions"
         options={{
-          tabBarLabel:'Questions',
+          tabBarLabel:'Q&A',
           tabBarIcon:({color})=><Ionicons name="globe-sharp" 
           size={24} color={color} />
         }}
         />
         <Tabs.Screen name="chat"
         options={{
-          tabBarLabel:'Profile',
+          tabBarLabel:'Chat',
           tabBarIcon:({color})=><Ionicons name="people-circle" 
           size={24} color={color} />
         }}

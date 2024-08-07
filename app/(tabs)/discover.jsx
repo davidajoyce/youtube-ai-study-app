@@ -1,10 +1,16 @@
 import { View, Text } from 'react-native'
-import React from 'react'
+import React, { useCallback, useState } from 'react'
+import YoutubePlayer from "react-native-youtube-iframe";
+import { Button } from 'react-native-web';
 
-export default function discover() {
+export default function Discover() {
   return (
     <View>
-      <Text>discover</Text>
+      <YoutubePlayer
+        height={300}
+        play={true}
+        videoId={"iee2TATGMyI"}
+      />
     </View>
-  )
+  );
 }
