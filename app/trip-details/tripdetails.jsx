@@ -1,5 +1,5 @@
 import { View, Text, Image, ScrollView, Button } from 'react-native'
-import React, {useEffect, useState } from 'react'
+import React, {useEffect, useRef, useState } from 'react'
 import { useLocalSearchParams, useNavigation } from 'expo-router'
 import { Colors } from '../../constants/Colors';
 import moment from 'moment'
@@ -8,12 +8,14 @@ import HotelList from '../../components/TripDetails/HotelList';
 import PlannedTrip from '../../components/TripDetails/PlannedTrip';
 import YoutubePlayer from "react-native-youtube-iframe";
 import { YoutubeTranscript } from 'youtube-transcript';
+import { TouchableOpacity } from 'react-native';
 
 export default function TripDetails() {
 
     const navigation=useNavigation();
     const {trip}=useLocalSearchParams();
     const [tripDetails,setTripDetails]=useState(JSON.parse(trip));
+    const playerRef = useRef();
 
     const formatData=(data)=>{
         return data&&JSON.parse(data);
@@ -97,6 +99,7 @@ export default function TripDetails() {
         }}
         /> */}
         <YoutubePlayer
+        ref={playerRef}
         height={300}
         play={false}
         videoId={"ZcZu1NYx-WE"}
@@ -109,6 +112,30 @@ export default function TripDetails() {
             borderTopLeftRadius:30,
             borderTopRightRadius:30
         }}> 
+            {/* Play at time youtube  */}
+            <TouchableOpacity 
+                onPress={() => {
+                    playerRef.current?.getCurrentTime().then(
+                    currentTime => console.log({currentTime})
+                    );
+
+                    playerRef.current?.getDuration().then(
+                        getDuration => console.log({getDuration})
+                    );
+                    // Time in seconds
+                    playerRef.current?.seekTo(3000)
+                }} 
+                style={{
+                    padding:20,
+                    backgroundColor:Colors.PRIMARY,
+                    borderRadius:15,
+                    marginTop:50
+                }}>
+                    <Text style={{
+                        color:Colors.WHITE,
+                        textAlign:'center'
+                    }}>Play at</Text>
+            </TouchableOpacity>
             <Text>transcript</Text>
             <Text style={{
                 fontSize:25,
