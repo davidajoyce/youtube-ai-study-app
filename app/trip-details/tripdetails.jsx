@@ -7,6 +7,7 @@ import FlightInfo from '../../components/TripDetails/FlightInfo';
 import HotelList from '../../components/TripDetails/HotelList';
 import PlannedTrip from '../../components/TripDetails/PlannedTrip';
 import YoutubePlayer from "react-native-youtube-iframe";
+import { YoutubeTranscript } from 'youtube-transcript';
 
 export default function TripDetails() {
 
@@ -23,9 +24,65 @@ export default function TripDetails() {
             headerTransparent:true,
             headerTitle:''
         });
-
+        
         trip&&setTripDetails(JSON.parse(trip))
+        GetTranscript()
     },[trip])
+
+
+    const GetTranscript = async()=>{
+       console.log("attempting to get transcript")
+       const transcript = await YoutubeTranscript
+       .fetchTranscript('ZcZu1NYx-WE')
+       .catch(e=>
+        console.log(e))
+       const textFromTranscript = transcript.map((item)=> item.text).join(" ");
+
+       console.log("transcript")
+       console.log(textFromTranscript)
+       console.log(transcript)
+       const formated = formatTranscriptForLLM(transcript)
+       console.log(formated)
+    }
+
+    const formatTimestamp = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    };
+      
+    const formatTranscriptForLLM = (transcriptData, segmentDuration = 10) => {
+    let formattedTranscript = [];
+    let currentSegment = {
+        startOffset: transcriptData[0].offset,
+        text: []
+    };
+    
+    for (let item of transcriptData) {
+        currentSegment.text.push(item.text);
+    
+        if (item.offset - currentSegment.startOffset >= segmentDuration) {
+        formattedTranscript.push({
+            timestamp: formatTimestamp(currentSegment.startOffset),
+            text: currentSegment.text.join(' ')
+        });
+        currentSegment = {
+            startOffset: item.offset,
+            text: []
+        };
+        }
+    }
+    
+    // Add the last segment
+    if (currentSegment.text.length > 0) {
+        formattedTranscript.push({
+        timestamp: formatTimestamp(currentSegment.startOffset),
+        text: currentSegment.text.join(' ')
+        });
+    }
+    
+    return formattedTranscript;
+    };
 
   return tripDetails&&(
     <ScrollView>
@@ -42,7 +99,7 @@ export default function TripDetails() {
         <YoutubePlayer
         height={300}
         play={false}
-        videoId={"iee2TATGMyI"}
+        videoId={"ZcZu1NYx-WE"}
         />
         <View style={{
             padding:15,
@@ -51,7 +108,8 @@ export default function TripDetails() {
             marginTop:-30,
             borderTopLeftRadius:30,
             borderTopRightRadius:30
-        }}>
+        }}> 
+            <Text>transcript</Text>
             <Text style={{
                 fontSize:25,
                 fontFamily:'outfit-bold'
