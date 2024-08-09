@@ -1,7 +1,8 @@
 import { View, Text } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { GiftedChat } from 'react-native-gifted-chat'
+import { GiftedChat, Bubble } from 'react-native-gifted-chat'
 import { chatGeneralSession } from '../../configs/AiModal';
+import Markdown from 'react-native-markdown-display';
 
 export default function ChatSession() {
 
@@ -20,6 +21,31 @@ export default function ChatSession() {
       },
     ])
   }, [])
+
+  const renderMessageText = (props) => {
+    return (
+      <View style={{ padding: 5 }}>
+        <Markdown>{props.currentMessage.text}</Markdown>
+      </View>
+    );
+  };
+
+  const renderBubble = (props) => {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          left: {
+            backgroundColor: '#f0f0f0',
+          },
+          right: {
+            backgroundColor: '#0084ff',
+          },
+        }}
+        renderMessageText={renderMessageText}
+      />
+    );
+  };
 
   const onSend = useCallback(async (newMessages = []) => {
     // Add user message to the chat
@@ -76,6 +102,7 @@ export default function ChatSession() {
       user={{
         _id: 1,
       }}
+      renderBubble={renderBubble}
     />
   )
 }
