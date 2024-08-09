@@ -1,34 +1,75 @@
-import { View, Text } from 'react-native'
+import { View, Text, Dimensions, StyleSheet } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { GiftedChat, Bubble } from 'react-native-gifted-chat'
+import { GiftedChat, Bubble, Composer } from 'react-native-gifted-chat'
 import { chatGeneralSession } from '../../configs/AiModal';
 import Markdown from 'react-native-markdown-display';
+import { Colors } from '../../constants/Colors';
+
 
 export default function ChatSession() {
+  console.ignoreLogs = ['Warning:'];
 
+  const { width: SCREEN_WIDTH } = Dimensions.get('window');
   const [messages, setMessages] = useState([])
   useEffect(() => {
     setMessages([
       {
         _id: 1,
-        text: 'Hello developer',
+        text: 'Ask me a question about the video',
         createdAt: new Date(),
         user: {
           _id: 2,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
+          name: 'AI Assistant',
         },
       },
     ])
   }, [])
 
+  const markdownStyles = (isAI) => ({
+    body: {
+      fontSize: 16, // Increase base font size
+      fontFamily: isAI ? 'outfit-regular' : undefined,
+      color: isAI ? Colors.PRIMARY : Colors.WHITE,
+    },
+    heading1: {
+      fontSize: 24, // Larger font size for h1
+      fontFamily:'outfit-regular'
+    },
+    heading2: {
+      fontSize: 22, // Larger font size for h2
+      fontFamily:'outfit-regular'
+    },
+    strong: {
+      fontSize: 18, // Larger font size for bold text
+      fontFamily:'outfit-regular'
+    },
+  });
+
+  const renderComposer = (props) => (
+    <Composer
+      {...props}
+      textInputStyle={{
+        fontFamily: 'outfit-regular', // Change this to your preferred font
+        fontSize: 18, // Adjust the font size as needed
+        color: Colors.PRIMARY, // Change the text color if desired
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingHorizontal: 12,
+      }}
+      placeholderTextColor="outfit-regular" // Change the placeholder text color if desired
+    />
+  );
+
   const renderMessageText = (props) => {
+    const isAI = props.currentMessage.user._id === 2;
     return (
       <View style={{ padding: 5 }}>
-        <Markdown>{props.currentMessage.text}</Markdown>
+        <Markdown style={markdownStyles(isAI)}>{props.currentMessage.text}</Markdown>
       </View>
     );
   };
+
+  const renderAvatar = () => null;
 
   const renderBubble = (props) => {
     return (
@@ -36,10 +77,20 @@ export default function ChatSession() {
         {...props}
         wrapperStyle={{
           left: {
-            backgroundColor: '#f0f0f0',
+            backgroundColor: Colors.LIGHT_GRAY,
+            borderWidth: 1,
+            borderRadius: 15,
+            marginLeft: 2,
+            marginRight: 15,
+            // maxWidth: SCREEN_WIDTH * 0.8
           },
           right: {
-            backgroundColor: '#0084ff',
+            backgroundColor: Colors.PRIMARY,
+            borderWidth: 1,
+            borderRadius: 15,
+            marginLeft:2,
+            marginRight: 10,
+            // maxWidth: SCREEN_WIDTH * 0.8
           },
         }}
         renderMessageText={renderMessageText}
@@ -68,7 +119,6 @@ export default function ChatSession() {
         user: {
           _id: 2,
           name: 'AI Assistant',
-          avatar: 'https://placeimg.com/140/140/tech',
         },
       };
 
@@ -96,13 +146,29 @@ export default function ChatSession() {
   }, []);
 
   return (
-    <GiftedChat
-      messages={messages}
-      onSend={messages => onSend(messages)}
-      user={{
-        _id: 1,
-      }}
-      renderBubble={renderBubble}
-    />
+    <View style={styles.container}>
+        <GiftedChat
+        messages={messages}
+        onSend={messages => onSend(messages)}
+        user={{
+            _id: 1,
+        }}
+        renderBubble={renderBubble}
+        renderAvatar={renderAvatar}
+        listViewProps={{
+            style: styles.chatBackground,
+        }}
+        />
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: Colors.WHITE,
+    },
+    chatBackground: {
+      backgroundColor: Colors.WHITE,
+    },
+  });
