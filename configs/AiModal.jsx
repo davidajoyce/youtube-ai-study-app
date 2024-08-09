@@ -24,6 +24,13 @@ const {
     maxOutputTokens: 8192,
     responseMimeType: "application/json",
   };
+
+  const generalGenConfig = {
+    temperature: 1,
+    topP: 0.95,
+    topK: 64,
+    maxOutputTokens: 8192,
+  };
   
  
     export const chatSession = model.startChat({
@@ -44,6 +51,13 @@ const {
           ],
         },
       ],
+    });
+
+    export const chatGeneralSession = model.startChat({
+      generalGenConfig,
+   // safetySettings: Adjust safety settings
+   // See https://ai.google.dev/gemini-api/docs/safety-settings
+      history: [],
     });
   
     // const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
