@@ -3,7 +3,7 @@ import Login from './../components/Login'
 import {auth} from './../configs/FirebaseConfig'
 import { Redirect } from "expo-router";
 
-LogBox.ignoreAllLogs();
+// LogBox.ignoreAllLogs();
 
 export default function Index() {
 
