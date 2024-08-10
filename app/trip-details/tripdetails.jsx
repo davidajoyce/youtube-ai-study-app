@@ -1,4 +1,4 @@
-import { View, Text, Image, ScrollView, Button, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, Dimensions } from 'react-native'
 import React, {useEffect, useRef, useState } from 'react'
 import { useLocalSearchParams, useNavigation } from 'expo-router'
 import { Colors } from '../../constants/Colors';
@@ -8,6 +8,8 @@ import { TouchableOpacity } from 'react-native';
 import { summaryChatSession } from '../../configs/AiModal';
 import { AI_SUMMARY_PROMPT } from '../../constants/Options';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 export default function TripDetails() {
 
     const navigation=useNavigation();
@@ -15,6 +17,7 @@ export default function TripDetails() {
     const [tripDetails,setTripDetails]=useState(JSON.parse(trip));
     const playerRef = useRef();
     const [videoSummary, setVideoSummary] = useState(null);
+    const scrollViewRef = useRef();
 
     const formatData=(data)=>{
         return data&&JSON.parse(data);
@@ -109,6 +112,7 @@ export default function TripDetails() {
     const seekToTimestamp = (timestamp) => {
         const [minutes, seconds] = timestamp.split(':').map(Number);
         playerRef.current?.seekTo(minutes * 60 + seconds);
+        scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
       };
 
     const TimestampButton = ({ timestamp, label }) => (
@@ -121,28 +125,32 @@ export default function TripDetails() {
     );
 
   return tripDetails&&(
-    <ScrollView>
-         {/* <Image source={{uri:
-        'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference='
-        +formatData(tripDetails?.tripData).locationInfo?.photoRef
-        +'&key='+process.env.EXPO_PUBLIC_GOOGLE_MAP_KEY}}
-        style={{
-            width:'100%',
-                height:330,
-                
-        }}
-        /> */}
-        <YoutubePlayer
-        ref={playerRef}
-        height={300}
-        play={false}
-        videoId={"ZcZu1NYx-WE"}
-        />
+    <ScrollView
+        ref={scrollViewRef}
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}>
+        <View style={styles.videoContainer}>
+            <YoutubePlayer
+            ref={playerRef}
+            height={styles.videoPlayer.height}
+            width={styles.videoPlayer.width}
+            play={false}
+            videoId={"ZcZu1NYx-WE"}
+            />
+        </View>
        <View style={styles.contentContainer}>
         {videoSummary && (
           <>
             <Text style={styles.sectionTitle}>Video Overview</Text>
             <Text style={styles.overviewText}>{videoSummary.overview}</Text>
+
+            <Text style={styles.sectionTitle}>Key Points</Text>
+            {videoSummary.keyPoints.map((point, index) => (
+              <View key={index} style={styles.pointContainer}>
+                <Text style={styles.pointText}>{point.point}</Text>
+                <TimestampButton timestamp={point.timestamp} />
+              </View>
+            ))}
 
             <Text style={styles.sectionTitle}>Fundamental Concepts</Text>
             {videoSummary.fundamentalConcepts.map((concept, index) => (
@@ -153,15 +161,6 @@ export default function TripDetails() {
                 <Text style={styles.importanceText}>Why it's important: {concept.importance}</Text>
               </View>
             ))}
-
-            <Text style={styles.sectionTitle}>Key Points</Text>
-            {videoSummary.keyPoints.map((point, index) => (
-              <View key={index} style={styles.pointContainer}>
-                <Text style={styles.pointText}>{point.point}</Text>
-                <TimestampButton timestamp={point.timestamp} />
-              </View>
-            ))}
-
             <Text style={styles.sectionTitle}>Recurring Themes</Text>
             {videoSummary.recurringThemes.map((theme, index) => (
               <View key={index} style={styles.themeContainer}>
@@ -171,7 +170,6 @@ export default function TripDetails() {
                     <TimestampButton 
                       key={tIndex} 
                       timestamp={timestamp} 
-                      label={`Instance ${tIndex + 1}`}
                     />
                   ))}
                 </View>
@@ -189,11 +187,20 @@ const styles = StyleSheet.create({
       flex: 1,
       backgroundColor: Colors.WHITE,
     },
+    scrollContent: {
+        flexGrow: 1,
+    },
+    videoContainer: {
+        width: SCREEN_WIDTH,
+        height: SCREEN_WIDTH * 9 / 16, // 16:9 aspect ratio
+        marginTop: 50, // Pull down the video a bit
+      },
+    videoPlayer: {
+        width: SCREEN_WIDTH,
+        height: SCREEN_WIDTH * 9 / 16,
+    },
     contentContainer: {
       padding: 15,
-      marginTop: -30,
-      borderTopLeftRadius: 30,
-      borderTopRightRadius: 30,
       backgroundColor: Colors.WHITE,
     },
     sectionTitle: {
