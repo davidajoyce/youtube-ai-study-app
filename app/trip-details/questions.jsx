@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView, TouchableHighlight } from 'react-native';
 import { quizChatSession } from '../../configs/AiModal';
 import { Colors } from '../../constants/Colors';
 import { AI_QUIZ_PROMPT } from '../../constants/Options';
@@ -34,6 +34,7 @@ export default function AIGeneratedQuizScreen({ route }) {
   const [quizData, setQuizData] = useState([]);
   const [answeredQuestions, setAnsweredQuestions] = useState({});
   const [score, setScore] = useState(0);
+  const [, forceUpdate] = useState();
 
 //   const { transcript } = route.params;
   const { transcript } = transcriptExample;
@@ -82,6 +83,8 @@ export default function AIGeneratedQuizScreen({ route }) {
     if (isCorrect) {
       setScore(prevScore => prevScore + 1);
     }
+
+    forceUpdate({});
   };
 
   if (loading) {
@@ -93,6 +96,23 @@ export default function AIGeneratedQuizScreen({ route }) {
     );
   }
 
+  const getOptionStyle = (questionIndex) => {
+    const answered = answeredQuestions[questionIndex];
+    console.log("answered")
+    console.log(answered)
+    if (answered) {
+      console.log("new style option")
+      return answered.isCorrect ? styles.correctOption : styles.incorrectOption;
+    }
+    console.log("grey style option")
+    return styles.optionButton;
+  };
+  
+  const getOptionTextStyle = (questionIndex) => {
+    const answered = answeredQuestions[questionIndex];
+    return answered.isCorrect ? styles.correctOptionText : styles.incorrectOptionText;
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
         <View style={styles.titleContainer}>
@@ -103,21 +123,21 @@ export default function AIGeneratedQuizScreen({ route }) {
             <View key={questionIndex} style={styles.questionContainer}>
             <Text style={styles.questionText}>{questionData.question}</Text>
             {questionData.options.map((option, optionIndex) => (
-                <TouchableOpacity
+                <TouchableHighlight
                 key={optionIndex}
-                style={[
-                    styles.optionButton,
-                    answeredQuestions[questionIndex]?.selectedAnswer === option && 
-                    (answeredQuestions[questionIndex].isCorrect ? styles.correctOption : styles.incorrectOption)
-                ]}
-                onPress={() => handleAnswerSelect(questionIndex, option)}
+                style={getOptionStyle(questionIndex)}
+                onPress={() => {
+                    handleAnswerSelect(questionIndex, option);
+                }}
                 disabled={answeredQuestions[questionIndex]}
+                underlayColor
+                activeOpacity={0.7}
                 >
                 <Text style={styles.optionText}>{option}</Text>
-                </TouchableOpacity>
+                </TouchableHighlight>
             ))}
             {answeredQuestions[questionIndex] && (
-                <Text style={styles.feedbackText}>
+                <Text style={getOptionTextStyle(questionIndex)}>
                 {answeredQuestions[questionIndex].isCorrect 
                     ? "Correct!" 
                     : `Incorrect. The correct answer is: ${questionData.correctAnswer}`}
@@ -185,17 +205,32 @@ const styles = StyleSheet.create({
   },
   correctOption: {
     backgroundColor: '#aaf0aa',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
   },
   incorrectOption: {
     backgroundColor: '#f0aaaa',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
   },
   optionText: {
     fontSize: 16,
     fontFamily: 'outfit',
   },
+  correctOptionText: {
+    color: '#006400', // Dark green color for text
+    fontFamily: 'outfit-bold'
+  },
+  incorrectOptionText: {
+    color: '#8b0000', // Dark red color for text
+    fontFamily: 'outfit-bold',
+    fontSize:18
+  },
   feedbackText: {
-    fontSize: 14,
-    fontFamily: 'outfit-medium',
+    fontSize: 18,
+    fontFamily: 'outfit-regular',
     marginTop: 10,
     fontStyle: 'italic',
   },
