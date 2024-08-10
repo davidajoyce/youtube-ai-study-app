@@ -56,7 +56,7 @@ export default function TripDetails() {
             console.log(FINAL_PROMPT)
             
             const result = await summaryChatSession.sendMessage(FINAL_PROMPT);
-            console.log('response from gemini')
+            console.log('response from gemini summary')
             console.log(result.response.text());
             const summary = JSON.parse(result.response.text());
 
