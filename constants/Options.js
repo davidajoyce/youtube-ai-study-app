@@ -56,4 +56,59 @@ export const AI_PROMPT='Generate Travel Plan for Location : {location}, for {tot
 
 export const AI_QUIZ_PROMPT='I want you to generate quiz questions based on the transcript: {transcriptNote}. Each quiz should have 5 multiple-choice questions with 4 options each. Please format the response in JSON format.'
 
-export const AI_SUMMARY_PROMPT='Include the following in your response:\nA brief overview of the main topic(s) covered in the video.\n3-5 fundamental concepts discussed, each with:\nA clear explanation of the concept\nThe timestamp (in MM:SS format) where the concept is introduced or best explained\nWhy this concept is important or how it relates to the broader topic\n3-5 key points or important learnings from the video, each with:\nA concise description of the point\nThe timestamp (in MM:SS format) where this point is made\n2-3 recurring themes or ideas that are emphasized throughout the video, each with:\nA brief description of the theme\n2-3 timestamps (in MM:SS format) where this theme is mentioned or reinforced\nTranscript:\n{transcriptNote}\nPlease format your response as a JSON object with the following structure:\n{\n\"overview\": \"Brief overview of the main topics covered in the video\",\n\"fundamentalConcepts\": [\n{\n\"concept\": \"Name or brief description of the concept\",\n\"explanation\": \"Detailed explanation of the concept\",\n\"timestamp\": \"MM:SS\",\n\"importance\": \"Why this concept is important or how it relates to the topic\"\n},\n...\n],\n\"keyPoints\": [\n{\n\"point\": \"Description of the key point or learning\",\n\"timestamp\": \"MM:SS\"\n},\n...\n],\n\"recurringThemes\": [\n{\n\"theme\": \"Description of the recurring theme or idea\",\n\"timestamps\": [\"MM:SS\", \"MM:SS\", \"MM:SS\"]\n},\n...\n]\n}'
+export const AI_SUMMARY_PROMPT=`
+Please analyze the following video transcript and create a comprehensive educational summary. Focus on helping someone learn from this video by identifying fundamental concepts, key points, and recurring themes, ensuring that examples are drawn from throughout the video's duration.
+
+Include the following in your response:
+
+1. A brief overview of the main topic(s) covered in the video.
+
+2. 3-5 fundamental concepts discussed, each with:
+   - A clear explanation of the concept
+   - 3 timestamps (in MM:SS format) where the concept is introduced, explained, or applied
+     - Include one timestamp from the beginning third of the video, one from the middle third, and one from the final third
+   - Why this concept is important or how it relates to the broader topic
+
+3. 3-5 key points or important learnings from the video, each with:
+   - A concise description of the point
+   - 3 timestamps (in MM:SS format) where this point is made or reinforced
+   - Ensure these timestamps are spread across the early, middle, and late portions of the video
+
+4. 2-3 recurring themes or ideas that are emphasized throughout the video, each with:
+   - A brief description of the theme
+   - 3 timestamps (in MM:SS format) where this theme is mentioned or reinforced
+   - IMPORTANT: Ensure these timestamps are spread out across the entire length of the video. Include one timestamp from the beginning third of the video, one from the middle third, and one from the final third.
+
+Transcript:
+{transcriptNote}
+
+Please format your response as a JSON object with the following structure:
+{
+  "overview": "Brief overview of the main topics covered in the video",
+  "fundamentalConcepts": [
+    {
+      "concept": "Name or brief description of the concept",
+      "explanation": "Detailed explanation of the concept",
+      "timestamps": ["MM:SS (early)", "MM:SS (middle)", "MM:SS (late)"],
+      "importance": "Why this concept is important or how it relates to the topic"
+    },
+    ...
+  ],
+  "keyPoints": [
+    {
+      "point": "Description of the key point or learning",
+      "timestamps": ["MM:SS (early)", "MM:SS (middle)", "MM:SS (late)"]
+    },
+    ...
+  ],
+  "recurringThemes": [
+    {
+      "theme": "Description of the recurring theme or idea",
+      "timestamps": ["MM:SS (early)", "MM:SS (middle)", "MM:SS (late)"]
+    },
+    ...
+  ]
+}
+
+Remember to ensure that all timestamps (for fundamental concepts, key points, and recurring themes) are spread out across the beginning, middle, and end portions of the video. This will provide a comprehensive view of how these elements develop and are reinforced throughout the content.
+`;

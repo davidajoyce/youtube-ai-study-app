@@ -52,3 +52,31 @@
         }
     ]
 }
+
+
+{
+    "overview": "Brief overview of the main topics covered in the video",
+    "fundamentalConcepts": [
+      {
+        "concept": "Name or brief description of the concept",
+        "explanation": "Detailed explanation of the concept",
+        "timestamps": ["MM:SS (early)", "MM:SS (middle)", "MM:SS (late)"],
+        "importance": "Why this concept is important or how it relates to the topic"
+      },
+      ...
+    ],
+    "keyPoints": [
+      {
+        "point": "Description of the key point or learning",
+        "timestamps": ["MM:SS (early)", "MM:SS (middle)", "MM:SS (late)"]
+      },
+      ...
+    ],
+    "recurringThemes": [
+      {
+        "theme": "Description of the recurring theme or idea",
+        "timestamps": ["MM:SS (early)", "MM:SS (middle)", "MM:SS (late)"]
+      },
+      ...
+    ]
+  }

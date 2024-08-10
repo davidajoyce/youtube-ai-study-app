@@ -148,7 +148,14 @@ export default function TripDetails() {
             {videoSummary.keyPoints.map((point, index) => (
               <View key={index} style={styles.pointContainer}>
                 <Text style={styles.pointText}>{point.point}</Text>
-                <TimestampButton timestamp={point.timestamp} />
+                <View style={styles.timestampContainer}>
+                  {point.timestamps.map((timestamp, tIndex) => (
+                    <TimestampButton 
+                      key={tIndex} 
+                      timestamp={timestamp} 
+                    />
+                  ))}
+                </View>
               </View>
             ))}
 
@@ -157,7 +164,14 @@ export default function TripDetails() {
               <View key={index} style={styles.conceptContainer}>
                 <Text style={styles.conceptTitle}>{concept.concept}</Text>
                 <Text style={styles.explanationText}>{concept.explanation}</Text>
-                <TimestampButton timestamp={concept.timestamp} />
+                <View style={styles.timestampContainer}>
+                  {concept.timestamps.map((timestamp, tIndex) => (
+                    <TimestampButton 
+                      key={tIndex} 
+                      timestamp={timestamp} 
+                    />
+                  ))}
+                </View>
                 <Text style={styles.importanceText}>Why it's important: {concept.importance}</Text>
               </View>
             ))}
