@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView } from 'react-native';
 import { quizChatSession } from '../../configs/AiModal';
 import { Colors } from '../../constants/Colors';
 import { AI_QUIZ_PROMPT } from '../../constants/Options';
@@ -94,48 +94,57 @@ export default function AIGeneratedQuizScreen({ route }) {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>AI-Generated Quiz</Text>
-      {quizData.map((questionData, questionIndex) => (
-        <View key={questionIndex} style={styles.questionContainer}>
-          <Text style={styles.questionText}>{questionData.question}</Text>
-          {questionData.options.map((option, optionIndex) => (
-            <TouchableOpacity
-              key={optionIndex}
-              style={[
-                styles.optionButton,
-                answeredQuestions[questionIndex]?.selectedAnswer === option && 
-                  (answeredQuestions[questionIndex].isCorrect ? styles.correctOption : styles.incorrectOption)
-              ]}
-              onPress={() => handleAnswerSelect(questionIndex, option)}
-              disabled={answeredQuestions[questionIndex]}
-            >
-              <Text style={styles.optionText}>{option}</Text>
-            </TouchableOpacity>
-          ))}
-          {answeredQuestions[questionIndex] && (
-            <Text style={styles.feedbackText}>
-              {answeredQuestions[questionIndex].isCorrect 
-                ? "Correct!" 
-                : `Incorrect. The correct answer is: ${questionData.correctAnswer}`}
+    <SafeAreaView style={styles.safeArea}>
+        <View style={styles.titleContainer}>
+            <Text style={styles.title}>AI-Generated Quiz</Text>
+       </View>
+        <ScrollView style={styles.container} contentContainerStyle={styles.scrollContentContainer}>
+        {quizData.map((questionData, questionIndex) => (
+            <View key={questionIndex} style={styles.questionContainer}>
+            <Text style={styles.questionText}>{questionData.question}</Text>
+            {questionData.options.map((option, optionIndex) => (
+                <TouchableOpacity
+                key={optionIndex}
+                style={[
+                    styles.optionButton,
+                    answeredQuestions[questionIndex]?.selectedAnswer === option && 
+                    (answeredQuestions[questionIndex].isCorrect ? styles.correctOption : styles.incorrectOption)
+                ]}
+                onPress={() => handleAnswerSelect(questionIndex, option)}
+                disabled={answeredQuestions[questionIndex]}
+                >
+                <Text style={styles.optionText}>{option}</Text>
+                </TouchableOpacity>
+            ))}
+            {answeredQuestions[questionIndex] && (
+                <Text style={styles.feedbackText}>
+                {answeredQuestions[questionIndex].isCorrect 
+                    ? "Correct!" 
+                    : `Incorrect. The correct answer is: ${questionData.correctAnswer}`}
+                </Text>
+            )}
+            </View>
+        ))}
+        <View style={styles.scoreContainer}>
+            <Text style={styles.scoreText}>
+            Your Score: {score} out of {quizData.length}
             </Text>
-          )}
         </View>
-      ))}
-      <View style={styles.scoreContainer}>
-        <Text style={styles.scoreText}>
-          Your Score: {score} out of {quizData.length}
-        </Text>
-      </View>
-    </ScrollView>
+        </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: Colors.WHITE,
+    },
   container: {
     flex: 1,
     padding: 20,
     backgroundColor: Colors.WHITE,
+    marginTop:20
   },
   loadingText: {
     fontSize: 18,
@@ -143,11 +152,22 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontFamily: 'outfit-medium',
   },
+  titleContainer: {
+    paddingTop: 10,
+    backgroundColor: Colors.WHITE,
+  },
   title: {
+    paddingTop: 30,
     fontSize: 24,
     fontFamily: 'outfit-bold',
-    marginBottom: 20,
     textAlign: 'center',
+  },
+  scrollContainer: {
+    flex: 1,
+    paddingHorizontal: 20
+  },
+  scrollContentContainer: {
+    paddingBottom: 20, // Add padding at the bottom of the scroll content
   },
   questionContainer: {
     marginBottom: 20,
@@ -180,8 +200,10 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   scoreContainer: {
-    marginTop: 20,
-    padding: 20,
+    marginTop: 10,
+    marginBottom:10,
+    padding: 10,
+    paddingBottom: 10,
     backgroundColor: '#f0f0f0',
     borderRadius: 10,
   },
