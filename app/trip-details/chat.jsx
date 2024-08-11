@@ -5,6 +5,8 @@ import { chatGeneralSession } from '../../configs/AiModal';
 import Markdown from 'react-native-markdown-display';
 import { Colors } from '../../constants/Colors';
 import { useVideo } from '../../context/VideoContext';
+import { auth, db } from './../../configs/FirebaseConfig'
+import { collection, getDocs, orderBy, query, where, and, doc, setDoc  } from 'firebase/firestore';
 
 
 export default function ChatSession() {
@@ -14,6 +16,9 @@ export default function ChatSession() {
   const [messages, setMessages] = useState([])
   const { videoId } = useVideo();
   console.log("chat videoId: ", videoId)
+  const [transcript, setTranscript] = useState('');
+  const user = auth.currentUser;
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setMessages([
@@ -27,7 +32,30 @@ export default function ChatSession() {
         },
       },
     ])
-  }, [])
+    GetTranscript()
+  }, [videoId, user])
+
+  const GetTranscript = useCallback(async()=>{
+    if (!videoId || !user?.email) return;
+    setIsLoading(true);
+    const q=query(collection(db,'UserVideoTranscript'),
+        and(
+            where('userEmail','==',user?.email),
+            where('videoId','==',videoId)
+        ));
+    const querySnapshot=await getDocs(q);
+
+    const firstDoc = querySnapshot.docs[0];
+    if (!querySnapshot.empty) {
+        const firstDoc = querySnapshot.docs[0];
+        console.log("transcript for chat", firstDoc.data());
+        setTranscript(firstDoc.data().transcript);
+    } else {
+        console.log("No transcript found");
+        setTranscript('');
+    }
+    setIsLoading(false);
+  }, [videoId, user]);
 
   const markdownStyles = (isAI) => ({
     body: {
@@ -108,11 +136,25 @@ export default function ChatSession() {
       GiftedChat.append(previousMessages, newMessages)
     );
 
+  
+    if (!transcript) {
+    console.log("No transcript available");
+    return;
+    }
+
     const userMessage = newMessages[0].text;
+
+    console.log("transcript for chat")
+    console.log(transcript)
+    const messageToSend = 'Based on the following video transcript:' 
+    + transcript + 'answer the following question:'
+    + userMessage;
+    console.log("message to send")
+    console.log(messageToSend)
 
     try {
       // Send message to AI and get response
-      const result = await chatGeneralSession.sendMessage(userMessage);
+      const result = await chatGeneralSession.sendMessage(messageToSend);
       const aiResponse = result.response.text();
 
       // Create AI message object
