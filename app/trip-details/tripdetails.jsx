@@ -14,8 +14,13 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function TripDetails() {
     const navigation=useNavigation();
-    const {trip}=useLocalSearchParams();
-    const [tripDetails,setTripDetails]=useState(JSON.parse(trip));
+    const {videoIdFrom}=useLocalSearchParams();
+    console.log("videoIdFrom")
+    console.log(videoIdFrom)
+    const videoId = JSON.parse(videoIdFrom)
+    console.log("videoId")
+    console.log(videoId)
+    // const [tripDetails,setTripDetails]=useState(JSON.parse(trip));
     const playerRef = useRef();
     const [videoSummary, setVideoSummary] = useState(null);
     const scrollViewRef = useRef();
@@ -23,7 +28,7 @@ export default function TripDetails() {
     const user = auth.currentUser;
     // console.log("user")
     // console.log(user)
-    const videoId = 'ZcZu1NYx-WE'
+    // const videoId = 'ZcZu1NYx-WE'
 
     const formatData=(data)=>{
         return data&&JSON.parse(data);
@@ -35,10 +40,10 @@ export default function TripDetails() {
             headerTitle:''
         });
         
-        trip&&setTripDetails(JSON.parse(trip))
+        // trip&&setTripDetails(JSON.parse(trip))
         console.log("GetTranscript")
         GetTranscript()
-    },[trip])
+    },[])
 
 
     const GetTranscript = async()=>{
@@ -202,7 +207,7 @@ export default function TripDetails() {
         );
       }
 
-  return tripDetails&&(
+  return (
     <ScrollView
         ref={scrollViewRef}
         style={styles.container}

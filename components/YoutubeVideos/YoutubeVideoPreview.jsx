@@ -1,12 +1,17 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 export default function YoutubeVideoPreview ({ videoId }) {
 
   const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/0.jpg`;
+  const router = useRouter();
 
   const handlePress = () => {
-    console.log("should navigate")
+    console.log("videoId is: ", videoId)
+    router.push({pathname:'/trip-details/tripdetails',params:{
+        videoIdFrom:JSON.stringify(videoId)
+    }})
   };
 
   return (
