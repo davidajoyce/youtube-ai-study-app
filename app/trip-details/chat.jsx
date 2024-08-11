@@ -148,7 +148,7 @@ export default function ChatSession() {
     console.log(transcript)
     const messageToSend = 'Based on the following video transcript:' 
     + transcript + 'answer the following question:'
-    + userMessage;
+    + userMessage + 'if the transcript is not a good source for the question use your knowledge';
     console.log("message to send")
     console.log(messageToSend)
 
@@ -191,6 +191,11 @@ export default function ChatSession() {
     }
   }, []);
 
+  // improve rendering of chat when collapsing the keyboard
+  const renderMessageContainer = (props) => {
+    return <FlatList {...props} removeClippedSubviews={true} />;
+  };
+
   return (
     <View style={styles.container}>
         <GiftedChat
@@ -204,6 +209,7 @@ export default function ChatSession() {
         listViewProps={{
             style: styles.chatBackground,
         }}
+        renderMessageContainer={renderMessageContainer}
         />
     </View>
   )
