@@ -4,6 +4,7 @@ import { GiftedChat, Bubble, Composer } from 'react-native-gifted-chat'
 import { chatGeneralSession } from '../../configs/AiModal';
 import Markdown from 'react-native-markdown-display';
 import { Colors } from '../../constants/Colors';
+import { useVideo } from '../../context/VideoContext';
 
 
 export default function ChatSession() {
@@ -11,6 +12,9 @@ export default function ChatSession() {
 
   const { width: SCREEN_WIDTH } = Dimensions.get('window');
   const [messages, setMessages] = useState([])
+  const { videoId } = useVideo();
+  console.log("chat videoId: ", videoId)
+
   useEffect(() => {
     setMessages([
       {

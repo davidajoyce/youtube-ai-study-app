@@ -3,6 +3,9 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator
 import { quizChatSession } from '../../configs/AiModal';
 import { Colors } from '../../constants/Colors';
 import { AI_QUIZ_PROMPT } from '../../constants/Options';
+import { useVideo } from '../../context/VideoContext';
+import { auth, db } from './../../configs/FirebaseConfig'
+import { collection, getDocs, orderBy, query, where, and, doc, setDoc  } from 'firebase/firestore';
 
 const transcriptExample = `React Native is an open source framework for building Android and iOS applications using React and the app platform’s native capabilities. With React Native, you use JavaScript to access your platform’s APIs as well as to describe the appearance and behavior of your UI using React components: bundles of reusable, nestable code. You can learn more about React in the next section. But first, let’s cover how components work in React Native.
 Views and mobile development
@@ -35,6 +38,9 @@ export default function AIGeneratedQuizScreen({ route }) {
   const [answeredQuestions, setAnsweredQuestions] = useState({});
   const [score, setScore] = useState(0);
   const [, forceUpdate] = useState();
+  const { videoId } = useVideo();
+  console.log("questions videoId: ", videoId)
+  const user = auth.currentUser;
 
 //   const { transcript } = route.params;
   const { transcript } = transcriptExample;
@@ -49,8 +55,18 @@ export default function AIGeneratedQuizScreen({ route }) {
 
     console.log("transcriptExample")
 
+    const q=query(collection(db,'UserVideoTranscript'),
+        and(
+            where('userEmail','==',user?.email),
+            where('videoId','==',videoId)
+        ));
+    const querySnapshot=await getDocs(q);
+
+    const firstDoc = querySnapshot.docs[0];
+    console.log("transcript for questions", firstDoc.data());
+
     const FINAL_PROMPT = AI_QUIZ_PROMPT
-            .replace('{transcriptNote}', transcriptExample)
+            .replace('{transcriptNote}', firstDoc.data().transcript)
 
     console.log('FINAL_PROMPT')
     console.log(FINAL_PROMPT);

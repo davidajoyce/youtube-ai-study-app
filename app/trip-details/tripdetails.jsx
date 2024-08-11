@@ -9,12 +9,14 @@ import { summaryChatSession } from '../../configs/AiModal';
 import { AI_SUMMARY_PROMPT } from '../../constants/Options';
 import { auth, db } from './../../configs/FirebaseConfig'
 import { collection, getDocs, orderBy, query, where, and, doc, setDoc  } from 'firebase/firestore';
+import { useVideo } from '../../context/VideoContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function TripDetails() {
     const navigation=useNavigation();
-    const {videoIdFrom}=useLocalSearchParams();
+    const {videoIdFrom} = useLocalSearchParams();
+    const {setVideoId} = useVideo();
     console.log("videoIdFrom")
     console.log(videoIdFrom)
     const videoId = JSON.parse(videoIdFrom)
@@ -39,6 +41,9 @@ export default function TripDetails() {
             headerTransparent:true,
             headerTitle:''
         });
+        if (videoIdFrom) {
+            setVideoId(videoId);
+        }
         
         // trip&&setTripDetails(JSON.parse(trip))
         console.log("GetTranscript")
@@ -65,6 +70,8 @@ export default function TripDetails() {
         console.log(doc.id, " => ", doc.data());
         });
 
+
+
         if(querySnapshot.empty){
             try {
                 console.log("attempting to get transcript")
@@ -73,6 +80,18 @@ export default function TripDetails() {
                 .catch(e=>
                     console.log(e))
                 const textFromTranscript = transcript.map((item)=> item.text).join(" ");
+
+                const transcriptDocId = (Date.now()).toString();
+                const transcript_result_ = await setDoc(doc(db, "UserVideoTranscript", docId), {
+                    userEmail: user.email,
+                    videoId: videoId,
+                    transcript: textFromTranscript,
+                    docId: transcriptDocId
+                }).then(resp=>{
+
+                }).catch(e=>
+                    console.log(e)
+                )
 
                 console.log("transcript")
                 console.log(textFromTranscript)
