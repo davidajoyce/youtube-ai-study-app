@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ai-travel-planner-app",
-    "slug": "ai-travel-planner-app",
+    "slug": "youtube-study-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -13,9 +13,12 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.youtubestudyapp.mobile"
     },
     "android": {
+      "package": "com.youtubestudyapp.mobile",
+      "googleServicesFile":"./android/app/google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -30,10 +33,19 @@
       "expo-router",
       [
         "@react-native-google-signin/google-signin"
-    ]
+      ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "84154a9d-8fbf-4bc7-bb11-9d31e1232082"
+      },
+      "router": {
+        "origin": false
+      }
+    },
+    "owner": "davidjoyce141"
   }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "424929637589",
+    "project_id": "study-2c2ea",
+    "storage_bucket": "study-2c2ea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:424929637589:android:40eec33beca32cb3b65e5c",
+        "android_client_info": {
+          "package_name": "com.youtubestudyapp.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvxZKcXVeypiOpkzpZ0GV7xz0YqEWg5z4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, StyleSheet, Dimensions } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, Dimensions, ActivityIndicator } from 'react-native'
 import React, {useEffect, useRef, useState } from 'react'
 import { useLocalSearchParams, useNavigation } from 'expo-router'
 import { Colors } from '../../constants/Colors';
@@ -18,6 +18,7 @@ export default function TripDetails() {
     const playerRef = useRef();
     const [videoSummary, setVideoSummary] = useState(null);
     const scrollViewRef = useRef();
+    const [loading, setLoading] = useState(true);
 
     const formatData=(data)=>{
         return data&&JSON.parse(data);
@@ -35,6 +36,7 @@ export default function TripDetails() {
 
 
     const GetTranscript = async()=>{
+        setLoading(true);
         try {
             console.log("attempting to get transcript")
             const transcript = await YoutubeTranscript
@@ -52,9 +54,26 @@ export default function TripDetails() {
             console.log("stringify formated")
             console.log(JSON.stringify(formated))
 
+            // Convert the transcript array to a string format
+            const transcriptString = formated.map(item => 
+                `${item.timestamp}: ${item.text}`
+            ).join('\n');
+
+            // Function to format seconds to MM:SS
+            const formatTime = (seconds) => {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = Math.floor(seconds % 60);
+                return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            };
+
+            // Calculate video length and third points
+            // const videoLength = formatTime(videoLengthInSeconds);
+            // const firstThird = formatTime(videoLengthInSeconds / 3);
+            // const secondThird = formatTime((videoLengthInSeconds / 3) * 2);
+
 
             const FINAL_PROMPT = AI_SUMMARY_PROMPT
-                    .replace('{transcriptNote}', JSON.stringify(formated))
+                    .replace('{transcriptNote}', transcriptString)
             console.log("AI_SUMMARY_PROMPT")
             console.log(FINAL_PROMPT)
             
@@ -67,6 +86,8 @@ export default function TripDetails() {
         } catch (error) {
             console.error('Error generating summary:', error);
             // Handle error (e.g., show an error message to the user)
+        } finally{
+            setLoading(false)
         }
     }
 
@@ -120,9 +141,25 @@ export default function TripDetails() {
         onPress={() => seekToTimestamp(timestamp)}
         style={styles.timestampButton}
     >
-        <Text style={styles.timestampText}>{label || `Watch at ${timestamp}`}</Text>
+        <Text style={styles.timestampText}>{label || `Play ${timestamp}`}</Text>
     </TouchableOpacity>
     );
+
+    if (loading) {
+        return (
+          <View style={styles.videoContainer}>
+            <YoutubePlayer
+                ref={playerRef}
+                height={styles.videoPlayer.height}
+                width={styles.videoPlayer.width}
+                play={false}
+                videoId={"ZcZu1NYx-WE"}
+            />
+            <ActivityIndicator size="large" color={Colors.PRIMARY} />
+            <Text style={styles.loadingText}>Generating Summary...</Text>
+          </View>
+        );
+      }
 
   return tripDetails&&(
     <ScrollView
@@ -275,4 +312,10 @@ const styles = StyleSheet.create({
       color: Colors.WHITE,
       fontWeight: 'bold',
     },
+    loadingText: {
+        fontSize: 18,
+        textAlign: 'center',
+        marginTop: 20,
+        fontFamily: 'outfit-medium',
+      },
   });
