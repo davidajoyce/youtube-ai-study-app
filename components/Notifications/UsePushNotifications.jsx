@@ -3,6 +3,7 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
+import { useRouter } from 'expo-router';
 
 
 export const UsePushNotifications = () => {
@@ -19,6 +20,7 @@ export const UsePushNotifications = () => {
 
   const notificationListener = useRef();
   const responseListener = useRef();
+  const router=useRouter();
 
   async function registerForPushNotificationsAsync() {
     let token;
@@ -60,24 +62,27 @@ export const UsePushNotifications = () => {
       setExpoPushToken(token);
     });
 
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-      });
+      notificationListener.current =
+        Notifications.addNotificationReceivedListener((notification) => {
+          console.log('Notification received:', notification);
+          setNotification(notification);
+        });
 
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
-      });
+      responseListener.current =
+        Notifications.addNotificationResponseReceivedListener((response) => {
+          console.log('Notification clicked', response);
+          console.log('going to question tab')
+          router.push('(tabs)/mytrip');
+        });
 
-    return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current
-      );
+      return () => {
+        Notifications.removeNotificationSubscription(
+          notificationListener.current
+        );
 
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
+        Notifications.removeNotificationSubscription(responseListener.current);
+      };
+    }, []);
 
   return {
     expoPushToken,

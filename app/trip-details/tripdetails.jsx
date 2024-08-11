@@ -7,11 +7,12 @@ import { YoutubeTranscript } from 'youtube-transcript';
 import { TouchableOpacity } from 'react-native';
 import { summaryChatSession } from '../../configs/AiModal';
 import { AI_SUMMARY_PROMPT } from '../../constants/Options';
+import { auth, db } from './../../configs/FirebaseConfig'
+import { collection, getDocs, orderBy, query, where, and, doc, setDoc  } from 'firebase/firestore';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function TripDetails() {
-
     const navigation=useNavigation();
     const {trip}=useLocalSearchParams();
     const [tripDetails,setTripDetails]=useState(JSON.parse(trip));
@@ -19,6 +20,10 @@ export default function TripDetails() {
     const [videoSummary, setVideoSummary] = useState(null);
     const scrollViewRef = useRef();
     const [loading, setLoading] = useState(true);
+    const user = auth.currentUser;
+    // console.log("user")
+    // console.log(user)
+    const videoId = 'ZcZu1NYx-WE'
 
     const formatData=(data)=>{
         return data&&JSON.parse(data);
@@ -31,63 +36,99 @@ export default function TripDetails() {
         });
         
         trip&&setTripDetails(JSON.parse(trip))
+        console.log("GetTranscript")
         GetTranscript()
     },[trip])
 
 
     const GetTranscript = async()=>{
         setLoading(true);
-        try {
-            console.log("attempting to get transcript")
-            const transcript = await YoutubeTranscript
-            .fetchTranscript('ZcZu1NYx-WE')
-            .catch(e=>
-                console.log(e))
-            const textFromTranscript = transcript.map((item)=> item.text).join(" ");
 
-            console.log("transcript")
-            console.log(textFromTranscript)
-            console.log(transcript)
-            const formated = formatTranscriptForLLM(transcript)
-            console.log("formatted")
-            console.log(formated)
-            console.log("stringify formated")
-            console.log(JSON.stringify(formated))
+        console.log("about to query")
+        console.log(user?.email)
+        console.log(videoId)
+        const q=query(collection(db,'UserVideoSummaries'),
+        and(
+            where('userEmail','==',user?.email),
+            where('videoId','==',videoId)
+        ));
 
-            // Convert the transcript array to a string format
-            const transcriptString = formated.map(item => 
-                `${item.timestamp}: ${item.text}`
-            ).join('\n');
+        console.log('about to query the docs')
+        const querySnapshot=await getDocs(q);
+        querySnapshot.forEach((doc) => { 
+        // doc.data() is never undefined for query doc snapshots
+        console.log(doc.id, " => ", doc.data());
+        });
 
-            // Function to format seconds to MM:SS
-            const formatTime = (seconds) => {
-                const minutes = Math.floor(seconds / 60);
-                const remainingSeconds = Math.floor(seconds % 60);
-                return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-            };
+        if(querySnapshot.empty){
+            try {
+                console.log("attempting to get transcript")
+                const transcript = await YoutubeTranscript
+                .fetchTranscript(videoId)
+                .catch(e=>
+                    console.log(e))
+                const textFromTranscript = transcript.map((item)=> item.text).join(" ");
 
-            // Calculate video length and third points
-            // const videoLength = formatTime(videoLengthInSeconds);
-            // const firstThird = formatTime(videoLengthInSeconds / 3);
-            // const secondThird = formatTime((videoLengthInSeconds / 3) * 2);
+                console.log("transcript")
+                console.log(textFromTranscript)
+                console.log(transcript)
+                const formated = formatTranscriptForLLM(transcript)
+                console.log("formatted")
+                console.log(formated)
+                console.log("stringify formated")
+                console.log(JSON.stringify(formated))
+
+                // Convert the transcript array to a string format
+                const transcriptString = formated.map(item => 
+                    `${item.timestamp}: ${item.text}`
+                ).join('\n');
+
+                // Function to format seconds to MM:SS
+                const formatTime = (seconds) => {
+                    const minutes = Math.floor(seconds / 60);
+                    const remainingSeconds = Math.floor(seconds % 60);
+                    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+                };
+
+                // Calculate video length and third points
+                // const videoLength = formatTime(videoLengthInSeconds);
+                // const firstThird = formatTime(videoLengthInSeconds / 3);
+                // const secondThird = formatTime((videoLengthInSeconds / 3) * 2);
 
 
-            const FINAL_PROMPT = AI_SUMMARY_PROMPT
-                    .replace('{transcriptNote}', transcriptString)
-            console.log("AI_SUMMARY_PROMPT")
-            console.log(FINAL_PROMPT)
-            
-            const result = await summaryChatSession.sendMessage(FINAL_PROMPT);
-            console.log('response from gemini summary')
-            console.log(result.response.text());
-            const summary = JSON.parse(result.response.text());
+                const FINAL_PROMPT = AI_SUMMARY_PROMPT
+                        .replace('{transcriptNote}', transcriptString)
+                console.log("AI_SUMMARY_PROMPT")
+                console.log(FINAL_PROMPT)
+                
+                const result = await summaryChatSession.sendMessage(FINAL_PROMPT);
+                console.log('response from gemini summary')
+                console.log(result.response.text());
+                const summary = JSON.parse(result.response.text());
 
-            setVideoSummary(summary);
-        } catch (error) {
-            console.error('Error generating summary:', error);
-            // Handle error (e.g., show an error message to the user)
-        } finally{
-            setLoading(false)
+                const docId = (Date.now()).toString();
+                const result_ = await setDoc(doc(db, "UserVideoSummaries", docId), {
+                    userEmail: user.email,
+                    videoId: videoId,
+                    videoSummary: summary,// AI Result 
+                    docId: docId
+                }).then(resp=>{
+
+                }).catch(e=>
+                    console.log(e)
+                )
+                setVideoSummary(summary);
+            } catch (error) {
+                console.error('Error generating summary:', error);
+                // Handle error (e.g., show an error message to the user)
+            } finally{
+                setLoading(false)
+            }
+        } else{
+            const firstDoc = querySnapshot.docs[0];
+            console.log(doc.id, " => ", firstDoc.data());
+            setVideoSummary(firstDoc.data().videoSummary);
+            setLoading(false);
         }
     }
 
@@ -153,7 +194,7 @@ export default function TripDetails() {
                 height={styles.videoPlayer.height}
                 width={styles.videoPlayer.width}
                 play={false}
-                videoId={"ZcZu1NYx-WE"}
+                videoId={videoId}
             />
             <ActivityIndicator size="large" color={Colors.PRIMARY} />
             <Text style={styles.loadingText}>Generating Summary...</Text>
@@ -172,7 +213,7 @@ export default function TripDetails() {
             height={styles.videoPlayer.height}
             width={styles.videoPlayer.width}
             play={false}
-            videoId={"ZcZu1NYx-WE"}
+            videoId={videoId}
             />
         </View>
        <View style={styles.contentContainer}>
