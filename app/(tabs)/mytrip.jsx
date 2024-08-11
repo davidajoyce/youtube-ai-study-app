@@ -3,11 +3,12 @@ import React, { useEffect, useState } from 'react'
 import {Colors} from './../../constants/Colors'
 import { Ionicons } from '@expo/vector-icons';
 import StartNewTripCard from '../../components/MyTrips/StartNewTripCard';
-import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
-import {auth, db} from './../../configs/FirebaseConfig'
 import UserTripList from '../../components/MyTrips/UserTripList';
 import { useRouter } from 'expo-router';
 import YoutubeVideoPreview from '../../components/YoutubeVideos/YoutubeVideoPreview';
+import { auth, db } from './../../configs/FirebaseConfig'
+import { collection, getDocs, orderBy, query, where, and, doc, setDoc  } from 'firebase/firestore';
+
 export default function MyTrip() {
 
   const [userTrips,setUserTrips]=useState([]);
@@ -15,25 +16,35 @@ export default function MyTrip() {
   const [loading,setLoading]=useState(false);
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [videos, setVideos] = useState([]);
+  const uniqueVideoIds = new Set();
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const router=useRouter();
   useEffect(()=>{
-    user&&GetMyTrips();
-  },[user])
+    user&&GetMyVideos();
+  },[user, refreshKey])
 
-  const GetMyTrips=async()=>{ 
+  const GetMyVideos=async()=>{ 
     setLoading(true); 
-    setUserTrips([]);
-    const q=query(collection(db,'UserTrips'),
+    setVideos([]);
+    const q=query(collection(db,'UserVideoIds'),
     where('userEmail','==',user?.email));
     const querySnapshot=await getDocs(q);
     querySnapshot.forEach((doc) => { 
       // doc.data() is never undefined for query doc snapshots
-      console.log(doc.id, " => ", doc.data());
-      setUserTrips(prev=>[...prev,doc.data()])
+      console.log("GetMyVideos ", doc.data());
+      if(!uniqueVideoIds.has(doc.data().videoId)){
+        setVideos(prev=>[...prev,doc.data()]);
+        uniqueVideoIds.add(doc.data().videoId);
+      }
+      
     });
     setLoading(false);
   }
+
+  const forceRefresh = () => {
+    setRefreshKey(oldKey => oldKey + 1);
+  };
 
   const handleYoutubeUrlSubmit = async () => {
     if (youtubeUrl.trim() === '') return;
@@ -44,7 +55,26 @@ export default function MyTrip() {
       const idPart = urlParts[urlParts.length - 1];
       const videoId = idPart.split('?')[0]
       console.log(videoId)
-      setVideos([{"id":videoId}])
+      
+
+      const docId = (Date.now()).toString();
+      const result_ = await setDoc(doc(db, "UserVideoIds", docId), {
+          userEmail: user.email,
+          videoId: videoId,
+          docId: docId
+      }).then(resp=>{
+
+      }).catch(e=>
+          console.log(e)
+      )
+      const videoJson = {
+        "docId":docId,
+        "userEmail":user.email,
+        "videoId":videoId
+      }
+      forceRefresh();
+  
+      //setVideos(prev=>[...videoJson])
     }
     setYoutubeUrl('');
   };
@@ -88,7 +118,7 @@ export default function MyTrip() {
 
   const renderItem = ({ item, index }) => {
     if (index < videos.length) {
-      return <YoutubeVideoPreview videoId={item.id} />;
+      return <YoutubeVideoPreview videoId={item.videoId} />;
     } else {
       return <UserTripList userTrips={[item]} />;
     }
