@@ -26,7 +26,7 @@ export default function AIGeneratedQuizScreen({ route }) {
     generateQuiz();
   }, []);
 
-  const generateQuiz = async (numberOfQuestions = 10) => {
+  const generateQuiz = async (numberOfQuestions = 5) => {
     setLoading(true);
     setQuizData([]);
     setAnsweredQuestions({});
