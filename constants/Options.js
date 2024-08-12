@@ -80,6 +80,7 @@ Ensure that:
 Each question is relevant to the transcript content.
 The correct answer is included among the 4 options.
 All options are plausible and related to the question.
+No option has inner quotation marks and each string is valid.
 The JSON structure is valid and complete.
 `
 
