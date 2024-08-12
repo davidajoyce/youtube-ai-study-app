@@ -4,7 +4,7 @@ import {auth} from '../configs/FirebaseConfig'
 import { Redirect } from "expo-router";
 import { UsePushNotifications } from '../components/Notifications/UsePushNotifications';
 
-// LogBox.ignoreAllLogs();
+LogBox.ignoreAllLogs();
 
 export default function Index() {
   // setup for push notifications
@@ -25,7 +25,7 @@ export default function Index() {
       }}
     >
       {user?
-        <Redirect href={'/mytrip'}/>:
+        <Redirect href={'/myvideo'}/>:
         <Login/>
       }
      

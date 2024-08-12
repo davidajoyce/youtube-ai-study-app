@@ -30,7 +30,7 @@ export default function SignIn() {
   .then((userCredential) => {
     // Signed in 
     const user = userCredential.user;
-    router.replace('/mytrip')
+    router.replace('/myvideo')
     console.log(user);
     // ...
   })

@@ -15,7 +15,7 @@ import axios from 'axios';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-export default function TripDetails() {
+export default function VideoDetails() {
     const navigation=useNavigation();
     const {videoIdFrom} = useLocalSearchParams();
     const {setVideoId} = useVideo();
@@ -24,15 +24,11 @@ export default function TripDetails() {
     const videoId = JSON.parse(videoIdFrom)
     console.log("videoId")
     console.log(videoId)
-    // const [tripDetails,setTripDetails]=useState(JSON.parse(trip));
     const playerRef = useRef();
     const [videoSummary, setVideoSummary] = useState(null);
     const scrollViewRef = useRef();
     const [loading, setLoading] = useState(true);
     const user = auth.currentUser;
-    // console.log("user")
-    // console.log(user)
-    // const videoId = 'ZcZu1NYx-WE'
 
     const formatData=(data)=>{
         return data&&JSON.parse(data);
@@ -47,7 +43,6 @@ export default function TripDetails() {
             setVideoId(videoId);
         }
         
-        // trip&&setTripDetails(JSON.parse(trip))
         console.log("GetTranscript")
         GetTranscript()
     },[])
@@ -76,21 +71,21 @@ export default function TripDetails() {
         if(querySnapshot.empty){
             try {
                 console.log("attempting to get transcript")
-                // const transcript = await YoutubeTranscript
-                // .fetchTranscript(videoId)
-                // .catch(e=>{
-                //     console.log('couldnt get transcript')
-                //     console.log(e)
-                // })
+                const transcript = await YoutubeTranscript
+                .fetchTranscript(videoId)
+                .catch(e=>{
+                    console.log('couldnt get transcript')
+                    console.log(e)
+                })
 
-                const youtubeUrl = `https://us-central1-study-2c2ea.cloudfunctions.net/api/youtube-transcript?v=${videoId}`
-                console.log('youtubeUrl: ', youtubeUrl)
+                // const youtubeUrl = `https://us-central1-study-2c2ea.cloudfunctions.net/api/youtube-transcript?v=${videoId}`
+                // console.log('youtubeUrl: ', youtubeUrl)
 
-                const response = await axios.get(
-                    youtubeUrl  
-                  );
-                console.log('firebase functions use', response)
-                const transcript = response.data;
+                // const response = await axios.get(
+                //     youtubeUrl  
+                //   );
+                // console.log('firebase functions use', response)
+                // const transcript = response.data;
                 console.log('newTranscript: ', transcript)
                 console.log('got the transccript : ', transcript)
                 const textFromTranscript = transcript.map((item)=> item.text).join(" ");
@@ -130,12 +125,6 @@ export default function TripDetails() {
                     const remainingSeconds = Math.floor(seconds % 60);
                     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
                 };
-
-                // Calculate video length and third points
-                // const videoLength = formatTime(videoLengthInSeconds);
-                // const firstThird = formatTime(videoLengthInSeconds / 3);
-                // const secondThird = formatTime((videoLengthInSeconds / 3) * 2);
-
 
                 const FINAL_PROMPT = AI_SUMMARY_PROMPT
                         .replace('{transcriptNote}', transcriptString)

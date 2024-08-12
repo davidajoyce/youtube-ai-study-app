@@ -38,7 +38,7 @@ export default function SignUp() {
     // Signed up 
     const user = userCredential.user;
     console.log(user);
-    router.replace('/mytrip')
+    router.replace('/myvideo')
 
     
 

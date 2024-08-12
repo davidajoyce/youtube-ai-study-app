@@ -1,6 +1,6 @@
-# Welcome to your Expo app 👋
+# Welcome to your Youtube AI study app👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This was created so you can quiz your youtube videos, summarise them and chat to them. If you wanted to better retain youtube video information this app will help.
 
 ## Get started
 
@@ -9,11 +9,15 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    ```bash
    npm install
    ```
+2. Add firebase config and api keys
+
+   update FirebaseConfig with your own firebase web app config. Follow Firebase setup instructions.
+   add .env and add your gemini API key "EXPO_PUBLIC_GOOGLE_GEMINI_API_KEY"
 
 2. Start the app
 
    ```bash
-    npx expo start
+    npx expo start --web
    ```
 
 In the output, you'll find options to open the app in a

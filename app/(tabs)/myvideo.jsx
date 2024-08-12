@@ -2,16 +2,13 @@ import { View, Text, ActivityIndicator, TouchableOpacity, ScrollView, TextInput,
 import React, { useEffect, useState } from 'react'
 import {Colors} from './../../constants/Colors'
 import { Ionicons } from '@expo/vector-icons';
-import StartNewTripCard from '../../components/MyTrips/StartNewTripCard';
-import UserTripList from '../../components/MyTrips/UserTripList';
 import { useRouter } from 'expo-router';
 import YoutubeVideoPreview from '../../components/YoutubeVideos/YoutubeVideoPreview';
 import { auth, db } from './../../configs/FirebaseConfig'
 import { collection, getDocs, orderBy, query, where, and, doc, setDoc  } from 'firebase/firestore';
 
-export default function MyTrip() {
+export default function MyVideo() {
 
-  const [userTrips,setUserTrips]=useState([]);
   const user=auth.currentUser;
   const [loading,setLoading]=useState(false);
   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -128,7 +125,7 @@ export default function MyTrip() {
     <View style={{ height: 100 }} />
   );
 
-  const allItems = [...videos, ...userTrips];
+  const allItems = [...videos];
 
   return (
     <FlatList
@@ -137,7 +134,6 @@ export default function MyTrip() {
       renderItem={renderItem}
       keyExtractor={(item, index) => index.toString()}
       ListFooterComponent={renderFooter}
-      //ListEmptyComponent={loading ? null : <StartNewTripCard />}
       contentContainerStyle={{
         padding: 25,
         backgroundColor: Colors.WHITE,

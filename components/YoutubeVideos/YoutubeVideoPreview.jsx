@@ -9,7 +9,7 @@ export default function YoutubeVideoPreview ({ videoId }) {
 
   const handlePress = () => {
     console.log("videoId is: ", videoId)
-    router.push({pathname:'/trip-details',params:{
+    router.push({pathname:'/video-details',params:{
         videoIdFrom:JSON.stringify(videoId)
     }})
   };

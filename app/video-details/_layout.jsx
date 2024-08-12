@@ -30,9 +30,9 @@ export default function TabLayout() {
             marginTop: 1, // Adjust icon position
           },
         }}
-      initialRouteName="tripdetails"
+      initialRouteName="videodetails"
       >
-          <Tabs.Screen name="tripdetails"
+          <Tabs.Screen name="videodetails"
             options={{
               tabBarLabel:'Summary',
               tabBarIcon:({color})=><Ionicons name="book" 

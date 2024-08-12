@@ -72,7 +72,7 @@ export const UsePushNotifications = () => {
         Notifications.addNotificationResponseReceivedListener((response) => {
           console.log('Notification clicked', response);
           console.log('going to question tab')
-          router.push('(tabs)/mytrip');
+          router.push('(tabs)/myvideo');
         });
 
       return () => {
