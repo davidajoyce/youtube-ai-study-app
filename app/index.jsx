@@ -7,13 +7,14 @@ import { UsePushNotifications } from '../components/Notifications/UsePushNotific
 // LogBox.ignoreAllLogs();
 
 export default function Index() {
-  const { expoPushToken, notification } = UsePushNotifications();
-  console.log("expoPushToken")
-  console.log(expoPushToken)
+  // setup for push notifications
+  // const { expoPushToken, notification } = UsePushNotifications();
+  // console.log("expoPushToken")
+  // console.log(expoPushToken)
 
-  const data = JSON.stringify(notification);
-  console.log("expoPushNotification")
-  console.log(data)
+  // const data = JSON.stringify(notification);
+  // console.log("expoPushNotification")
+  // console.log(data)
 
   const user=auth.currentUser;
 

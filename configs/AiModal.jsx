@@ -36,7 +36,7 @@ const {
     temperature: 0.7,
     topP: 0.8,
     topK: 40,
-    maxOutputTokens: 1024,
+    maxOutputTokens: 8192,
     responseMimeType: "application/json"
   };
 
@@ -81,20 +81,7 @@ const {
   
     export const quizChatSession = model.startChat({
       generationConfig: quizGenerationConfig,
-      history: [
-        {
-          role: "user",
-          parts: [
-            {text: "I want you to generate quiz questions based on the transcript: React Native is an open source framework for building Android and iOS applications using React and the app platform’s native capabilities. With React Native, you use JavaScript to access your platform’s APIs as well as to describe the appearance and behavior of your UI using React components: bundles of reusable, nestable code. You can learn more about React in the next section. But first, let’s cover how components work in React Native.\nViews and mobile development\nIn Android and iOS development, a view is the basic building block of UI: a small rectangular element on the screen which can be used to display text, images, or respond to user input. Even the smallest visual elements of an app, like a line of text or a button, are kinds of views. Some kinds of views can contain other views. It’s views all the way down!\n\nDiagram of Android and iOS app showing them both built on top of atomic elements called views.\nJust a sampling of the many views used in Android and iOS apps.\nNative Components\nIn Android development, you write views in Kotlin or Java; in iOS development, you use Swift or Objective-C. With React Native, you can invoke these views with JavaScript using React components. At runtime, React Native creates the corresponding Android and iOS views for those components. Because React Native components are backed by the same views as Android and iOS, React Native apps look, feel, and perform like any other apps. We call these platform-backed components Native Components.\n\nReact Native comes with a set of essential, ready-to-use Native Components you can use to start building your app today. These are React Native's Core Components.\n\nReact Native also lets you build your own Native Components for Android and iOS to suit your app’s unique needs. We also have a thriving ecosystem of these community-contributed components. Check out Native Directory to find what the community has been creating.\n\nCore Components\nReact Native has many Core Components for everything from controls to activity indicators. You can find them all documented in the API section. You will mostly work with the following Core Components:\n\nReact Native UI Component\tAndroid View\tiOS View\tWeb Analog\tDescription\n<View>\t<ViewGroup>\t<UIView>\tA non-scrolling <div>\tA container that supports layout with flexbox, style, some touch handling, and accessibility controls\n<Text>\t<TextView>\t<UITextView>\t<p>\tDisplays, styles, and nests strings of text and even handles touch events\n<Image>\t<ImageView>\t<UIImageView>\t<img>\tDisplays different types of images\n<ScrollView>\t<ScrollView>\t<UIScrollView>\t<div>\tA generic scrolling container that can contain multiple components and views\n<TextInput>\t<EditText>\t<UITextField>\t<input type=\"text\">\tAllows the user to enter text\nIn the next section, you will start combining these Core Components to learn about how React works. Have a play with them here now!. Each quiz should have 5 multiple-choice questions with 4 options each. Please format the response in JSON format."},
-          ],
-        },
-        {
-          role: "model",
-          parts: [
-            {text: "```json\n{\n  \"questions\": [\n    {\n      \"question\": \"What is React Native?\",\n      \"options\": [\n        \"A framework for building websites using JavaScript.\",\n        \"A framework for building Android and iOS applications using React.\",\n        \"A programming language for building mobile applications.\",\n        \"A tool for creating graphic designs for mobile apps.\"\n      ],\n      \"correctAnswer\": \"A framework for building Android and iOS applications using React.\"\n    },\n    {\n      \"question\": \"What is the basic building block of UI in Android and iOS development?\",\n      \"options\": [\n        \"Component\",\n        \"View\",\n        \"Element\",\n        \"Module\"\n      ],\n      \"correctAnswer\": \"View\"\n    },\n    {\n      \"question\": \"What is the purpose of Native Components in React Native?\",\n      \"options\": [\n        \"To create custom animations for the app.\",\n        \"To handle user interactions and events.\",\n        \"To invoke Android and iOS views with JavaScript.\",\n        \"To manage data storage and retrieval.\"\n      ],\n      \"correctAnswer\": \"To invoke Android and iOS views with JavaScript.\"\n    },\n    {\n      \"question\": \"Which of the following is NOT a Core Component in React Native?\",\n      \"options\": [\n        \"<View>\",\n        \"<Text>\",\n        \"<Image>\",\n        \"<Button>\"\n      ],\n      \"correctAnswer\": \"<Button>\"\n    },\n    {\n      \"question\": \"What is the web analog for the React Native <ScrollView> component?\",\n      \"options\": [\n        \"<div>\",\n        \"<span>\",\n        \"<p>\",\n        \"<img>\"\n      ],\n      \"correctAnswer\": \"<div>\"\n    }\n  ]\n}\n```"},
-          ],
-        },
-      ],
+      history: [],
     });
 
 

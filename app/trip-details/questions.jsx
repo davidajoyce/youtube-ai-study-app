@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView, TouchableHighlight } from 'react-native';
 import { quizChatSession } from '../../configs/AiModal';
 import { Colors } from '../../constants/Colors';
-import { AI_QUIZ_PROMPT } from '../../constants/Options';
+import { AI_QUIZ_PROMPT, AI_QUIZ_PROMPT_V2 } from '../../constants/Options';
 import { useVideo } from '../../context/VideoContext';
 import { auth, db } from './../../configs/FirebaseConfig'
 import { collection, getDocs, orderBy, query, where, and, doc, setDoc  } from 'firebase/firestore';
@@ -65,8 +65,9 @@ export default function AIGeneratedQuizScreen({ route }) {
     const firstDoc = querySnapshot.docs[0];
     console.log("transcript for questions", firstDoc.data());
 
-    const FINAL_PROMPT = AI_QUIZ_PROMPT
+    const FINAL_PROMPT = AI_QUIZ_PROMPT_V2
             .replace('{transcriptNote}', firstDoc.data().transcript)
+            .replace('{numberOfQuestions}', '10');
 
     console.log('FINAL_PROMPT')
     console.log(FINAL_PROMPT);

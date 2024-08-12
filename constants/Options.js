@@ -56,6 +56,33 @@ export const AI_PROMPT='Generate Travel Plan for Location : {location}, for {tot
 
 export const AI_QUIZ_PROMPT='I want you to generate quiz questions based on the transcript: {transcriptNote}. Each quiz should have 5 multiple-choice questions with 4 options each. Please format the response in JSON format.'
 
+export const AI_QUIZ_PROMPT_V2=`
+Generate a quiz based on the following transcript:
+{transcriptNote}
+
+Create {numberOfQuestions} multiple-choice questions with 4 options each. Format the response in the following JSON structure:
+{
+"questions": [
+{
+"question": "Question text here",
+"options": [
+"Option 1",
+"Option 2",
+"Option 3",
+"Option 4"
+],
+"correctAnswer": "Correct option here"
+},
+// Repeat for a total of {numberOfQuestions}  questions
+]
+}
+Ensure that:
+Each question is relevant to the transcript content.
+The correct answer is included among the 4 options.
+All options are plausible and related to the question.
+The JSON structure is valid and complete.
+`
+
 export const AI_SUMMARY_PROMPT=`
 Please analyze the following video transcript and create a comprehensive educational summary. This video is approximately {videoLength} long, so ensure your analysis covers the entire duration, not just the beginning.
 

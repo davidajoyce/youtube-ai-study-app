@@ -120,7 +120,7 @@ export default function MyTrip() {
     if (index < videos.length) {
       return <YoutubeVideoPreview videoId={item.videoId} />;
     } else {
-      return <UserTripList userTrips={[item]} />;
+      return <View/>;
     }
   };
 
@@ -137,7 +137,7 @@ export default function MyTrip() {
       renderItem={renderItem}
       keyExtractor={(item, index) => index.toString()}
       ListFooterComponent={renderFooter}
-      ListEmptyComponent={loading ? null : <StartNewTripCard />}
+      //ListEmptyComponent={loading ? null : <StartNewTripCard />}
       contentContainerStyle={{
         padding: 25,
         backgroundColor: Colors.WHITE,

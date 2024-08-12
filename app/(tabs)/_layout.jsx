@@ -5,30 +5,30 @@ import { Ionicons } from '@expo/vector-icons';
 import {Colors} from './../../constants/Colors'
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{
-        headerShown:false,
-        tabBarActiveTintColor:Colors.PRIMARY
+    <Tabs 
+    screenOptions={{
+      headerShown: false,
+      tabBarActiveTintColor: Colors.PRIMARY,
+      tabBarStyle: {
+        height: 70, // Increase the height of the tab bar
+      },
+      tabBarItemStyle: {
+        padding: 10, // Add padding to increase touchable area
+      },
+      tabBarLabelStyle: {
+        fontSize: 14, // Increase font size of the label
+        marginBottom: 1, // Adjust label position
+      },
+      tabBarIconStyle: {
+        marginTop: 1, // Adjust icon position
+      },
     }}>
         <Tabs.Screen name="mytrip"
           options={{
-            tabBarLabel:'My Trip',
-            tabBarIcon:({color})=><Ionicons name="location-sharp" 
+            tabBarLabel:'My Videos',
+            tabBarIcon:({color})=><Ionicons name="videocam" 
             size={24} color={color} />
           }}
-        />
-        <Tabs.Screen name="discover"
-        options={{
-          tabBarLabel:'Discover',
-          tabBarIcon:({color})=><Ionicons name="globe-sharp" 
-          size={24} color={color} />
-        }}
-        />
-        <Tabs.Screen name="profile"
-        options={{
-          tabBarLabel:'Profile',
-          tabBarIcon:({color})=><Ionicons name="people-circle" 
-          size={24} color={color} />
-        }}
         />
     </Tabs>
   )
