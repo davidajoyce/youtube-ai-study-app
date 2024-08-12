@@ -6,30 +6,8 @@ import { AI_QUIZ_PROMPT, AI_QUIZ_PROMPT_V2 } from '../../constants/Options';
 import { useVideo } from '../../context/VideoContext';
 import { auth, db } from './../../configs/FirebaseConfig'
 import { collection, getDocs, orderBy, query, where, and, doc, setDoc  } from 'firebase/firestore';
+import { Ionicons } from '@expo/vector-icons';
 
-const transcriptExample = `React Native is an open source framework for building Android and iOS applications using React and the app platform’s native capabilities. With React Native, you use JavaScript to access your platform’s APIs as well as to describe the appearance and behavior of your UI using React components: bundles of reusable, nestable code. You can learn more about React in the next section. But first, let’s cover how components work in React Native.
-Views and mobile development
-In Android and iOS development, a view is the basic building block of UI: a small rectangular element on the screen which can be used to display text, images, or respond to user input. Even the smallest visual elements of an app, like a line of text or a button, are kinds of views. Some kinds of views can contain other views. It’s views all the way down!
-
-Diagram of Android and iOS app showing them both built on top of atomic elements called views.
-Just a sampling of the many views used in Android and iOS apps.
-Native Components
-In Android development, you write views in Kotlin or Java; in iOS development, you use Swift or Objective-C. With React Native, you can invoke these views with JavaScript using React components. At runtime, React Native creates the corresponding Android and iOS views for those components. Because React Native components are backed by the same views as Android and iOS, React Native apps look, feel, and perform like any other apps. We call these platform-backed components Native Components.
-
-React Native comes with a set of essential, ready-to-use Native Components you can use to start building your app today. These are React Native's Core Components.
-
-React Native also lets you build your own Native Components for Android and iOS to suit your app’s unique needs. We also have a thriving ecosystem of these community-contributed components. Check out Native Directory to find what the community has been creating.
-
-Core Components
-React Native has many Core Components for everything from controls to activity indicators. You can find them all documented in the API section. You will mostly work with the following Core Components:
-
-React Native UI Component	Android View	iOS View	Web Analog	Description
-<View>	<ViewGroup>	<UIView>	A non-scrolling <div>	A container that supports layout with flexbox, style, some touch handling, and accessibility controls
-<Text>	<TextView>	<UITextView>	<p>	Displays, styles, and nests strings of text and even handles touch events
-<Image>	<ImageView>	<UIImageView>	<img>	Displays different types of images
-<ScrollView>	<ScrollView>	<UIScrollView>	<div>	A generic scrolling container that can contain multiple components and views
-<TextInput>	<EditText>	<UITextField>	<input type="text">	Allows the user to enter text
-In the next section, you will start combining these Core Components to learn about how React works. Have a play with them here now!`
 
 
 export default function AIGeneratedQuizScreen({ route }) {
@@ -42,16 +20,17 @@ export default function AIGeneratedQuizScreen({ route }) {
   console.log("questions videoId: ", videoId)
   const user = auth.currentUser;
 
-//   const { transcript } = route.params;
-  const { transcript } = transcriptExample;
 
   useEffect(() => {
     console.log("about to generate quiz")
     generateQuiz();
   }, []);
 
-  const generateQuiz = async () => {
+  const generateQuiz = async (numberOfQuestions = 10) => {
     setLoading(true);
+    setQuizData([]);
+    setAnsweredQuestions({});
+    setScore(0);
 
     console.log("transcriptExample")
 
@@ -67,7 +46,7 @@ export default function AIGeneratedQuizScreen({ route }) {
 
     const FINAL_PROMPT = AI_QUIZ_PROMPT_V2
             .replace('{transcriptNote}', firstDoc.data().transcript)
-            .replace('{numberOfQuestions}', '10');
+            .replace('{numberOfQuestions}', numberOfQuestions.toString());
 
     console.log('FINAL_PROMPT')
     console.log(FINAL_PROMPT);
@@ -104,14 +83,14 @@ export default function AIGeneratedQuizScreen({ route }) {
     forceUpdate({});
   };
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color={Colors.PRIMARY} />
-        <Text style={styles.loadingText}>Generating Quiz...</Text>
-      </View>
-    );
-  }
+//   if (loading) {
+//     return (
+//       <View style={styles.container}>
+//         <ActivityIndicator size="large" color={Colors.PRIMARY} />
+//         <Text style={styles.loadingText}>Generating Quiz...</Text>
+//       </View>
+//     );
+//   }
 
   const getOptionStyle = (questionIndex, option) => {
     const answered = answeredQuestions[questionIndex];
@@ -131,11 +110,29 @@ export default function AIGeneratedQuizScreen({ route }) {
     return answered.isCorrect ? styles.correctOptionText : styles.incorrectOptionText;
   };
 
+  const QuizButton = ({ count, onPress }) => (
+    <TouchableOpacity style={styles.generateButton} onPress={onPress}>
+      <Ionicons name="refresh" size={18} color={Colors.WHITE} />
+      <Text style={styles.generateButtonText}>{count} Q&A</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={styles.safeArea}>
-        <View style={styles.titleContainer}>
-            <Text style={styles.title}>AI-Generated Quiz</Text>
-       </View>
+     <View style={styles.headerContainer}>
+        <Text style={styles.title}>AI-Generated Quiz</Text>
+        <View style={styles.buttonContainer}>
+          <QuizButton count={5} onPress={() => generateQuiz(5)} />
+          <QuizButton count={10} onPress={() => generateQuiz(10)} />
+          <QuizButton count={20} onPress={() => generateQuiz(20)} />
+        </View>
+      </View>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.PRIMARY} />
+          <Text style={styles.loadingText}>Generating Quiz...</Text>
+        </View>
+      ) : (
         <ScrollView style={styles.container} contentContainerStyle={styles.scrollContentContainer}>
         {quizData.map((questionData, questionIndex) => (
             <View key={questionIndex} style={styles.questionContainer}>
@@ -166,6 +163,7 @@ export default function AIGeneratedQuizScreen({ route }) {
             </Text>
         </View>
         </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
@@ -175,6 +173,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.WHITE,
     },
+  headerContainer: {
+    backgroundColor: Colors.WHITE,
+    paddingTop: 10,
+  },
   container: {
     flex: 1,
     padding: 20,
@@ -262,4 +264,29 @@ const styles = StyleSheet.create({
     fontFamily: 'outfit-bold',
     textAlign: 'center',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 10,
+    backgroundColor: Colors.WHITE,
+  },
+  generateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.PRIMARY,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  generateButtonText: {
+    color: Colors.WHITE,
+    marginLeft: 5,
+    fontFamily: 'outfit-bold',
+    fontSize: 14,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });
