@@ -112,15 +112,16 @@ export default function AIGeneratedQuizScreen({ route }) {
     );
   }
 
-  const getOptionStyle = (questionIndex) => {
+  const getOptionStyle = (questionIndex, option) => {
     const answered = answeredQuestions[questionIndex];
-    console.log("answered")
-    console.log(answered)
     if (answered) {
-      console.log("new style option")
-      return answered.isCorrect ? styles.correctOption : styles.incorrectOption;
+      if (answered.selectedAnswer === option) {
+        return answered.isCorrect ? styles.correctOption : styles.incorrectOption;
+      }
+      if (option === quizData[questionIndex].correctAnswer) {
+        return styles.correctOption;
+      }
     }
-    console.log("grey style option")
     return styles.optionButton;
   };
   
@@ -141,14 +142,11 @@ export default function AIGeneratedQuizScreen({ route }) {
             {questionData.options.map((option, optionIndex) => (
                 <TouchableHighlight
                 key={optionIndex}
-                style={getOptionStyle(questionIndex)}
-                onPress={() => {
-                    handleAnswerSelect(questionIndex, option);
-                }}
+                style={getOptionStyle(questionIndex, option)}
+                onPress={() => handleAnswerSelect(questionIndex, option)}
                 disabled={answeredQuestions[questionIndex]}
-                underlayColor
-                activeOpacity={0.7}
-                >
+                underlayColor='none'
+              >
                 <Text style={styles.optionText}>{option}</Text>
                 </TouchableHighlight>
             ))}

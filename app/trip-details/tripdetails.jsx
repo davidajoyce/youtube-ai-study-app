@@ -10,6 +10,7 @@ import { AI_SUMMARY_PROMPT } from '../../constants/Options';
 import { auth, db } from './../../configs/FirebaseConfig'
 import { collection, getDocs, orderBy, query, where, and, doc, setDoc  } from 'firebase/firestore';
 import { useVideo } from '../../context/VideoContext';
+import CustomYouTubePlayer from '../../components/YoutubeVideos/CustomYoutubePlayer';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -77,20 +78,26 @@ export default function TripDetails() {
                 console.log("attempting to get transcript")
                 const transcript = await YoutubeTranscript
                 .fetchTranscript(videoId)
-                .catch(e=>
-                    console.log(e))
+                // .catch(e=>{
+                //     console.log('couldnt get transcript')
+                //     console.log(e)
+                // })
+                console.log('got the transccript : ', transcript)
                 const textFromTranscript = transcript.map((item)=> item.text).join(" ");
+                console.log('full transcript: ', textFromTranscript)
 
                 const transcriptDocId = (Date.now()).toString();
-                const transcript_result_ = await setDoc(doc(db, "UserVideoTranscript", docId), {
+                const transcript_result_ = await setDoc(doc(db, "UserVideoTranscript", transcriptDocId), {
                     userEmail: user.email,
                     videoId: videoId,
                     transcript: textFromTranscript,
                     docId: transcriptDocId
                 }).then(resp=>{
 
-                }).catch(e=>
+                }).catch(e=>{
+                    console.log('couldnt save to firebase')
                     console.log(e)
+                }
                 )
 
                 console.log("transcript")
@@ -213,7 +220,7 @@ export default function TripDetails() {
     if (loading) {
         return (
           <View style={styles.videoContainer}>
-            <YoutubePlayer
+            <CustomYouTubePlayer
                 ref={playerRef}
                 height={styles.videoPlayer.height}
                 width={styles.videoPlayer.width}
@@ -232,7 +239,7 @@ export default function TripDetails() {
         style={styles.container}
         contentContainerStyle={styles.scrollContent}>
         <View style={styles.videoContainer}>
-            <YoutubePlayer
+            <CustomYouTubePlayer
             ref={playerRef}
             height={styles.videoPlayer.height}
             width={styles.videoPlayer.width}
@@ -307,10 +314,9 @@ const styles = StyleSheet.create({
         flexGrow: 1,
     },
     videoContainer: {
-        width: SCREEN_WIDTH,
-        height: SCREEN_WIDTH * 9 / 16, // 16:9 aspect ratio
-        marginTop: 50, // Pull down the video a bit
-      },
+        width: '100%',
+        paddingTop: 50, // Adjust as needed
+    },
     videoPlayer: {
         width: SCREEN_WIDTH,
         height: SCREEN_WIDTH * 9 / 16,

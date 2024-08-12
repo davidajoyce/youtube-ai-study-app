@@ -1,5 +1,5 @@
-import { View, Text, Dimensions, StyleSheet } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import { View, Text, Dimensions, StyleSheet, Platform } from 'react-native'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { GiftedChat, Bubble, Composer } from 'react-native-gifted-chat'
 import { chatGeneralSession } from '../../configs/AiModal';
 import Markdown from 'react-native-markdown-display';
@@ -16,11 +16,14 @@ export default function ChatSession() {
   const [messages, setMessages] = useState([])
   const { videoId } = useVideo();
   console.log("chat videoId: ", videoId)
-  const [transcript, setTranscript] = useState('');
+  const [transcript, setTranscript] = useState();
   const user = auth.currentUser;
   const [isLoading, setIsLoading] = useState(true);
+  // solve issue with transcript loading and using the transcript in onSend
+  const transcriptRef = useRef('');
 
   useEffect(() => {
+    console.log("useEffect triggered", { videoId, userEmail: user?.email });
     setMessages([
       {
         _id: 1,
@@ -36,25 +39,40 @@ export default function ChatSession() {
   }, [videoId, user])
 
   const GetTranscript = useCallback(async()=>{
-    if (!videoId || !user?.email) return;
-    setIsLoading(true);
-    const q=query(collection(db,'UserVideoTranscript'),
-        and(
-            where('userEmail','==',user?.email),
-            where('videoId','==',videoId)
-        ));
-    const querySnapshot=await getDocs(q);
-
-    const firstDoc = querySnapshot.docs[0];
-    if (!querySnapshot.empty) {
-        const firstDoc = querySnapshot.docs[0];
-        console.log("transcript for chat", firstDoc.data());
-        setTranscript(firstDoc.data().transcript);
-    } else {
-        console.log("No transcript found");
-        setTranscript('');
+    if (!videoId || !user?.email) {
+        console.log("Missing videoId or user email", { videoId, userEmail: user?.email });
+        return;
     }
-    setIsLoading(false);
+    setIsLoading(true);
+    try {
+        console.log("Fetching transcript for", { videoId, userEmail: user?.email });
+        const q=query(collection(db,'UserVideoTranscript'),
+            and(
+                where('userEmail','==',user?.email),
+                where('videoId','==',videoId)
+            ));
+        const querySnapshot=await getDocs(q);
+
+        const firstDoc = querySnapshot.docs[0];
+        if (!querySnapshot.empty) {
+            const firstDoc = querySnapshot.docs[0];
+            console.log("transcript for chat", firstDoc.data());
+            const transcriptData = firstDoc.data().transcript;
+            setTranscript(transcriptData);
+            transcriptRef.current = transcriptData;
+        } else {
+            console.log("No transcript found");
+            setTranscript('');
+            transcriptRef.current = '';
+        }
+    } catch (error) {
+        console.error("Error fetching transcript:", error);
+        setTranscript('');
+        transcriptRef.current = '';
+    } finally {
+        setIsLoading(false); 
+        // console.log('transcript set is :', transcript)
+    }
   }, [videoId, user]);
 
   const markdownStyles = (isAI) => ({
@@ -136,8 +154,9 @@ export default function ChatSession() {
       GiftedChat.append(previousMessages, newMessages)
     );
 
-  
-    if (!transcript) {
+    const currentTranscript = transcriptRef.current;
+
+    if (!currentTranscript) {
     console.log("No transcript available");
     return;
     }
@@ -145,14 +164,20 @@ export default function ChatSession() {
     const userMessage = newMessages[0].text;
 
     console.log("transcript for chat")
-    console.log(transcript)
+    console.log(currentTranscript)
     const messageToSend = 'Based on the following video transcript:' 
-    + transcript + 'answer the following question:'
+    + currentTranscript + 'answer the following question:'
     + userMessage + 'if the transcript is not a good source for the question use your knowledge';
     console.log("message to send")
     console.log(messageToSend)
 
     try {
+        setMessages(prevMessages => GiftedChat.append(prevMessages, [{
+            _id: Math.random().toString(),
+            text: 'Thinking...',
+            createdAt: new Date(),
+            user: { _id: 2, name: 'AI Assistant' },
+            }]));
       // Send message to AI and get response
       const result = await chatGeneralSession.sendMessage(messageToSend);
       const aiResponse = result.response.text();
@@ -198,19 +223,19 @@ export default function ChatSession() {
 
   return (
     <View style={styles.container}>
+        {isLoading ? (
+        <Text>Loading transcript...</Text>
+      ) : (
         <GiftedChat
-        messages={messages}
-        onSend={messages => onSend(messages)}
-        user={{
-            _id: 1,
-        }}
-        renderBubble={renderBubble}
-        renderAvatar={renderAvatar}
-        listViewProps={{
-            style: styles.chatBackground,
-        }}
-        renderMessageContainer={renderMessageContainer}
+          messages={messages}
+          onSend={onSend}
+          user={{ _id: 1 }}
+          renderBubble={renderBubble}
+          renderAvatar={() => null}
+          listViewProps={{ style: styles.chatBackground }}
+          {...(Platform.OS === 'web' ? { renderMessageContainer: props => <View>{props.children}</View> } : {})}
         />
+      )}
     </View>
   )
 }
