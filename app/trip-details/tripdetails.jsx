@@ -11,6 +11,7 @@ import { auth, db } from './../../configs/FirebaseConfig'
 import { collection, getDocs, orderBy, query, where, and, doc, setDoc  } from 'firebase/firestore';
 import { useVideo } from '../../context/VideoContext';
 import CustomYouTubePlayer from '../../components/YoutubeVideos/CustomYoutubePlayer';
+import axios from 'axios';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -72,16 +73,25 @@ export default function TripDetails() {
         });
 
 
-
         if(querySnapshot.empty){
             try {
                 console.log("attempting to get transcript")
-                const transcript = await YoutubeTranscript
-                .fetchTranscript(videoId)
+                // const transcript = await YoutubeTranscript
+                // .fetchTranscript(videoId)
                 // .catch(e=>{
                 //     console.log('couldnt get transcript')
                 //     console.log(e)
                 // })
+
+                const youtubeUrl = `https://us-central1-study-2c2ea.cloudfunctions.net/api/youtube-transcript?v=${videoId}`
+                console.log('youtubeUrl: ', youtubeUrl)
+
+                const response = await axios.get(
+                    youtubeUrl  
+                  );
+                console.log('firebase functions use', response)
+                const transcript = response.data;
+                console.log('newTranscript: ', transcript)
                 console.log('got the transccript : ', transcript)
                 const textFromTranscript = transcript.map((item)=> item.text).join(" ");
                 console.log('full transcript: ', textFromTranscript)
@@ -149,6 +159,8 @@ export default function TripDetails() {
                     console.log(e)
                 )
                 setVideoSummary(summary);
+
+                // Restore the original fetch function
             } catch (error) {
                 console.error('Error generating summary:', error);
                 // Handle error (e.g., show an error message to the user)
